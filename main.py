@@ -112,13 +112,23 @@ def submit():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        if username == 'admin' and password == 'password123':
-            session['logged_in'] = True
-            return redirect(url_for('dashboard'))
-        flash("Invalid credentials!", "danger")
-    return render_template('login.html', error=session.get('_flashes', []))
+        try:
+            username = request.form.get('username')
+            password = request.form.get('password')
+            
+            if not username or not password:
+                flash("Please enter both username and password")
+                return render_template('login.html')
+                
+            if username == 'admin' and password == 'password123':
+                session['logged_in'] = True
+                return redirect(url_for('dashboard'))
+            
+            flash("Invalid username or password")
+        except Exception as e:
+            flash("An error occurred. Please try again.")
+            logging.error(f"Login error: {str(e)}")
+    return render_template('login.html')
 
 # Dashboard Route
 @app.route('/dashboard')
