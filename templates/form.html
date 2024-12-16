@@ -94,13 +94,10 @@
     </div>
 
     <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
-        // Set default language to Arabic on page load
-        window.onload = function() {
-            changeLanguage();
-        }
-        // Language Switcher Logic
-        function changeLanguage() {
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
             const selectedLang = document.getElementById('languageSelect').value;
             const body = document.body;
 

@@ -16,10 +16,9 @@ app.permanent_session_lifetime = datetime.timedelta(days=1)
 DATABASE = 'data/entries.db'
 
 # Enhanced Logging Setup
-if not os.path.exists('logs'):
-    os.makedirs('logs')
-    os.makedirs('logs/entries')
-    os.makedirs('logs/user_info')
+for dir_path in ['logs', 'logs/entries', 'logs/user_info']:
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path, exist_ok=True)
 
 # Error logger
 error_logger = logging.getLogger('error_logger')
