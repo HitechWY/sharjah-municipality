@@ -4,6 +4,7 @@ import os
 import datetime
 import csv
 import openpyxl
+import io
 import logging
 
 # Initialize Flask App
@@ -159,6 +160,37 @@ def export_csv():
     response = make_response('\n'.join([','.join(map(str, row)) for row in output]))
     response.headers["Content-Disposition"] = "attachment; filename=entries.csv"
     response.headers["Content-Type"] = "text/csv"
+    return response
+
+# Export to Excel Route
+@app.route('/export_excel')
+def export_excel():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM entries")
+    entries = cursor.fetchall()
+    conn.close()
+
+    # Create Excel workbook
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.append(['ID', 'Car Number', 'Car Type', 'Car Code', 'Inspector ID', 'Pull Area', 
+               'Discharge Area', 'Notes', 'Reference Number', 'Date & Time', 'Photo', 'Location'])
+    
+    for entry in entries:
+        ws.append(entry)
+
+    # Create response
+    response = make_response()
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+    
+    response.data = output.read()
+    response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    response.headers['Content-Disposition'] = 'attachment; filename=entries.xlsx'
     return response
 
 # Logout Route
