@@ -40,8 +40,7 @@ def init_db():
             notes TEXT,
             reference_number TEXT,
             date_time TEXT,
-            photo TEXT,
-            location TEXT
+            photo TEXT
         )
     ''')
     conn.commit()
@@ -58,10 +57,8 @@ def generate_reference():
     return f"{today}-{str(count).zfill(4)}"
 
 # Home Route
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def home():
-    if request.method == 'POST':
-        return submit()
     reference_number = request.args.get('reference_number')
     return render_template('form.html', reference_number=reference_number)
 
@@ -77,7 +74,7 @@ def submit():
         pull_area = request.form['pullArea']
         discharge_area = request.form['dischargeArea']
         notes = request.form.get('notes', '')
-        location = request.form.get('location', '')
+        photo = request.files['photo'] if 'photo' in request.files else None
 
         # Save Photo
         photo_path = None
@@ -96,9 +93,9 @@ def submit():
         conn = sqlite3.connect(DATABASE)
         cursor = conn.cursor()
         cursor.execute('''
-            INSERT INTO entries (car_number, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, location)
+            INSERT INTO entries (car_number, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (car_number, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, location))
+        ''', (car_number, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo_path))
         conn.commit()
         conn.close()
 
@@ -106,21 +103,19 @@ def submit():
         return jsonify({'reference_number': reference_number})
     except Exception as e:
         logging.error(f"Error in form submission: {e}")
-        flash("An error occurred while submitting the form. Please try again.", "danger")
-        return redirect(url_for('home'))
+        return jsonify({'error': str(e)}), 400
 
 # Login Route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form.get('username')
+        password = request.form.get('password')
         if username == 'admin' and password == 'password123':
             session['logged_in'] = True
             return redirect(url_for('dashboard'))
-        else:
-            flash("Invalid credentials!", "danger")
-    return render_template('login.html')
+        flash("Invalid credentials!", "danger")
+    return render_template('login.html', error=session.get('_flashes', []))
 
 # Dashboard Route
 @app.route('/dashboard')

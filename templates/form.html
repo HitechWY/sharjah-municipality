@@ -151,11 +151,14 @@
         document.getElementById("dataEntryForm").onsubmit = async function (e) {
             e.preventDefault();
             const formData = new FormData(this);
-
-            const response = await fetch("/submit", {
-                method: "POST",
-                body: formData
-            });
+            try {
+                const response = await fetch("/submit", {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
 
             const data = await response.json();
             if (!response.ok) {
