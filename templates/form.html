@@ -66,6 +66,13 @@
                 <button type="button" id="getLocationButton" onclick="getLocation()">Get Location</button>
             </div>
 
+            <div class="form-group">
+                <label for="photo" id="photoLabel">Photo:</label>
+                <input type="file" id="photo" name="photo" accept="image/*">
+                <button type="button" onclick="openCamera()">Take Photo</button>
+            </div>
+
+
             <!-- Submit Button -->
             <div class="form-group">
                 <button type="submit" id="submitButton">Submit</button>
@@ -118,7 +125,8 @@
                     notesLabel: "Notes:",
                     locationLabel: "Location:",
                     submitButton: "Submit",
-                    formTitle: "Rain Service"
+                    formTitle: "Rain Service",
+                    photoLabel: "Photo:"
                 },
                 ar: {
                     languageSelectLabel: "تغير اللغة:",
@@ -131,7 +139,8 @@
                     notesLabel: "الملاحظات:",
                     locationLabel: "الموقع:",
                     submitButton: "إرسال",
-                    formTitle: "خدمة سحب الأمطار"
+                    formTitle: "خدمة سحب الأمطار",
+                    photoLabel: "صورة:"
                 }
             };
 
@@ -183,6 +192,12 @@
                 alert('Error submitting form: ' + error.message);
             }
         };
+
+        function openCamera() {
+            const photoInput = document.getElementById('photo');
+            photoInput.setAttribute('capture', 'environment');
+            photoInput.click();
+        }
     </script>
 </body>
 </html>
