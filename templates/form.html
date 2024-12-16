@@ -24,7 +24,7 @@
         <h1 id="formTitle">Rain Service</h1>
 
         <!-- Form -->
-        <form id="dataEntryForm">
+        <form id="dataEntryForm" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="carNumber" id="carNumberLabel">Car Number:</label>
                 <input type="text" id="carNumber" name="carNumber" required>
@@ -152,12 +152,16 @@
             e.preventDefault();
             const formData = new FormData(this);
 
-            const response = await fetch("/", {
+            const response = await fetch("/submit", {
                 method: "POST",
                 body: formData
             });
 
             const data = await response.json();
+            if (!response.ok) {
+                alert('Error submitting form: ' + data.error);
+                return;
+            }
             if (data.reference_number) {
                 document.getElementById("thankYouMessage").style.display = "block";
                 document.getElementById("refNumber").innerText = data.reference_number;
