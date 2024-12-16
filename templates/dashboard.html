@@ -148,6 +148,33 @@
     <div class="container">
         <h1>Data Entries Overview</h1>
 
+        <!-- Search and Filter Controls -->
+        <div class="filters-container mb-4">
+            <form class="form-inline justify-content-center" method="GET">
+                <select name="field" class="form-control mr-2">
+                    <option value="all" {% if search_field == 'all' %}selected{% endif %}>All Fields</option>
+                    <option value="car_number" {% if search_field == 'car_number' %}selected{% endif %}>Car Number</option>
+                    <option value="inspector_id" {% if search_field == 'inspector_id' %}selected{% endif %}>Inspector ID</option>
+                    <option value="pull_area" {% if search_field == 'pull_area' %}selected{% endif %}>Pull Area</option>
+                    <option value="discharge_area" {% if search_field == 'discharge_area' %}selected{% endif %}>Discharge Area</option>
+                    <option value="reference_number" {% if search_field == 'reference_number' %}selected{% endif %}>Reference Number</option>
+                    <option value="date_time" {% if search_field == 'date_time' %}selected{% endif %}>Date & Time</option>
+                </select>
+                <input type="text" name="search" class="form-control mr-2" placeholder="Search..." value="{{ search_term }}">
+                <select name="sort" class="form-control mr-2">
+                    <option value="date_time" {% if sort_by == 'date_time' %}selected{% endif %}>Sort by Date</option>
+                    <option value="car_number" {% if sort_by == 'car_number' %}selected{% endif %}>Sort by Car Number</option>
+                    <option value="inspector_id" {% if sort_by == 'inspector_id' %}selected{% endif %}>Sort by Inspector</option>
+                    <option value="reference_number" {% if sort_by == 'reference_number' %}selected{% endif %}>Sort by Reference</option>
+                </select>
+                <select name="order" class="form-control mr-2">
+                    <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>Descending</option>
+                    <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>Ascending</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Apply</button>
+            </form>
+        </div>
+
         <!-- Export Buttons -->
         <div class="text-center mb-4">
             <a href="{{ url_for('export_csv') }}" class="btn btn-success btn-export">Export to CSV</a>

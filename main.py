@@ -243,12 +243,52 @@ def login():
 def dashboard():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
+    
+    # Get search parameters
+    search_term = request.args.get('search', '')
+    search_field = request.args.get('field', 'all')
+    sort_by = request.args.get('sort', 'date_time')
+    sort_order = request.args.get('order', 'desc')
+    
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM entries")
+    
+    if search_term and search_field != 'all':
+        field_map = {
+            'car_number': 1,
+            'inspector_id': 4,
+            'pull_area': 5,
+            'discharge_area': 6,
+            'reference_number': 8,
+            'date_time': 9
+        }
+        column_index = field_map.get(search_field)
+        cursor.execute(f"SELECT * FROM entries WHERE {search_field} LIKE ?", (f'%{search_term}%',))
+    else:
+        cursor.execute("SELECT * FROM entries")
+        
     entries = cursor.fetchall()
+    
+    # Sort entries
+    if sort_by in ['car_number', 'inspector_id', 'pull_area', 'discharge_area', 'reference_number', 'date_time']:
+        field_map = {
+            'car_number': 1,
+            'inspector_id': 4,
+            'pull_area': 5,
+            'discharge_area': 6,
+            'reference_number': 8,
+            'date_time': 9
+        }
+        column_index = field_map[sort_by]
+        entries = sorted(entries, key=lambda x: x[column_index], reverse=(sort_order == 'desc'))
+    
     conn.close()
-    return render_template('dashboard.html', entries=entries)
+    return render_template('dashboard.html', 
+                         entries=entries,
+                         search_term=search_term,
+                         search_field=search_field,
+                         sort_by=sort_by,
+                         sort_order=sort_order)
 
 # Export to CSV Route
 @app.route('/export_csv')
