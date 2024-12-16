@@ -57,8 +57,10 @@ def generate_reference():
     return f"{today}-{str(count).zfill(4)}"
 
 # Home Route
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def home():
+    if request.method == 'POST':
+        return submit()
     reference_number = request.args.get('reference_number')
     return render_template('form.html', reference_number=reference_number)
 
