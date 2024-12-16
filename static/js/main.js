@@ -1,18 +1,8 @@
 
 // Language Switcher Logic
-function switchLanguage() {
+function changeLanguage() {
     const selectedLang = document.getElementById('languageSelect').value;
     const body = document.body;
-
-    if (selectedLang === 'ar') {
-        body.classList.remove('ltr');
-        body.classList.add('rtl');
-    } else {
-        body.classList.remove('rtl');
-        body.classList.add('ltr');
-    }
-
-    // Update Translations
     const translations = {
         en: {
             languageSelectLabel: "Select Language:",
@@ -26,7 +16,8 @@ function switchLanguage() {
             locationLabel: "Location:",
             submitButton: "Submit",
             formTitle: "Rain Service",
-            photoLabel: "Photo:"
+            photoLabel: "Photo:",
+            getLocationButton: "Get Location"
         },
         ar: {
             languageSelectLabel: "تغير اللغة:",
@@ -40,9 +31,18 @@ function switchLanguage() {
             locationLabel: "الموقع:",
             submitButton: "إرسال",
             formTitle: "خدمة سحب الأمطار",
-            photoLabel: "صورة:"
+            photoLabel: "صورة:",
+            getLocationButton: "الحصول على الموقع"
         }
     };
+
+    if (selectedLang === 'ar') {
+        body.classList.remove('ltr');
+        body.classList.add('rtl');
+    } else {
+        body.classList.remove('rtl');
+        body.classList.add('ltr');
+    }
 
     const langContent = translations[selectedLang];
     for (const key in langContent) {
@@ -75,7 +75,10 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 const response = await fetch("/submit", {
                     method: "POST",
-                    body: formData
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
                 });
 
                 const data = await response.json();
@@ -92,11 +95,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById("telegramLink").href = `https://t.me/share/url?url=${encodeURIComponent(message)}`;
                 }
             } catch (error) {
-                alert('Error submitting form: ' + error);
+                alert('Error submitting form: ' + error.message);
             }
         };
     }
 
-    // Set default language
-    switchLanguage();
+    // Initialize language
+    changeLanguage();
 });
+
+function openCamera() {
+    const photoInput = document.getElementById('photo');
+    photoInput.setAttribute('capture', 'environment');
+    photoInput.click();
+}
