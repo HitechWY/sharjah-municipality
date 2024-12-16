@@ -6,6 +6,7 @@ import csv
 import openpyxl
 import io
 import logging
+from PIL import Image
 
 # Initialize Flask App
 app = Flask(__name__)
@@ -88,7 +89,13 @@ def submit():
             if not os.path.exists(photo_folder):
                 os.makedirs(photo_folder)
             photo_path = os.path.join(photo_folder, photo.filename)
-            photo.save(photo_path)
+            # Open and compress image
+            with Image.open(photo) as img:
+                # Convert to RGB if necessary
+                if img.mode in ('RGBA', 'P'): 
+                    img = img.convert('RGB')
+                # Compress image
+                img.save(photo_path, 'JPEG', quality=85, optimize=True)
 
         # Generate Reference Number and Date
         reference_number = generate_reference()
