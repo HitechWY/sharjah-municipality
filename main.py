@@ -40,7 +40,8 @@ def init_db():
             notes TEXT,
             reference_number TEXT,
             date_time TEXT,
-            photo TEXT
+            photo TEXT,
+            location TEXT
         )
     ''')
     conn.commit()
@@ -76,7 +77,7 @@ def submit():
         pull_area = request.form['pullArea']
         discharge_area = request.form['dischargeArea']
         notes = request.form.get('notes', '')
-        photo = request.files['photo'] if 'photo' in request.files else None
+        location = request.form.get('location', '')
 
         # Save Photo
         photo_path = None
@@ -95,9 +96,9 @@ def submit():
         conn = sqlite3.connect(DATABASE)
         cursor = conn.cursor()
         cursor.execute('''
-            INSERT INTO entries (car_number, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo)
+            INSERT INTO entries (car_number, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, location)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (car_number, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo_path))
+        ''', (car_number, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, location))
         conn.commit()
         conn.close()
 
