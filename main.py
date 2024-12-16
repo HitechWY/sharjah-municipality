@@ -72,7 +72,6 @@ def init_db():
         os.makedirs('data')
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
-    cursor.execute('''DROP TABLE IF EXISTS entries''')
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS entries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -98,7 +97,9 @@ def generate_reference():
     today = datetime.datetime.now().strftime("%Y-%m-%d")
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(*) FROM entries WHERE date_time LIKE ?", (f"{today}%",))
+    # Get count of entries for today only
+    cursor.execute("SELECT COUNT(*) FROM entries WHERE date_time >= ? AND date_time < ?", 
+                  (f"{today} 00:00:00", f"{today} 23:59:59"))
     count = cursor.fetchone()[0] + 1
     conn.close()
     return f"{today}-{str(count).zfill(4)}"
