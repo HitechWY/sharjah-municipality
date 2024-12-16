@@ -45,7 +45,8 @@ def init_db():
             reference_number TEXT,
             date_time TEXT,
             photo TEXT,
-            location TEXT
+            location TEXT,
+            last_submission TEXT
         )
     ''')
     conn.commit()
@@ -73,6 +74,20 @@ def submit():
     try:
         # Retrieve Form Data
         car_number = request.form['carNumber']
+        
+        # Check cooldown period
+        conn = sqlite3.connect(DATABASE)
+        cursor = conn.cursor()
+        cursor.execute("SELECT last_submission FROM entries WHERE car_number = ? ORDER BY last_submission DESC LIMIT 1", (car_number,))
+        last_entry = cursor.fetchone()
+        
+        if last_entry:
+            last_time = datetime.datetime.strptime(last_entry[0], "%Y-%m-%d %H:%M:%S")
+            current_time = datetime.datetime.now()
+            time_diff = (current_time - last_time).total_seconds()
+            
+            if time_diff < 60:  # 60 seconds cooldown
+                return jsonify({'error': 'Please wait 60 seconds before submitting another entry for the same car number'}), 429
         car_type = request.form['carType']
         car_code = request.form['carCode']
         inspector_id = request.form['inspectorId']
@@ -105,9 +120,9 @@ def submit():
         conn = sqlite3.connect(DATABASE)
         cursor = conn.cursor()
         cursor.execute('''
-            INSERT INTO entries (car_number, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo, location)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (car_number, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo_path, location))
+            INSERT INTO entries (car_number, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo, location, last_submission)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (car_number, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo_path, location, date_time))
         conn.commit()
         conn.close()
 
