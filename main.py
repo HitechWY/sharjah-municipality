@@ -9,6 +9,7 @@ import logging
 # Initialize Flask App
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
+app.permanent_session_lifetime = datetime.timedelta(days=1)
 
 DATABASE = 'data/entries.db'
 
@@ -112,22 +113,19 @@ def submit():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        try:
-            username = request.form.get('username')
-            password = request.form.get('password')
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        if not username or not password:
+            flash("Please enter both username and password")
+            return render_template('login.html')
             
-            if not username or not password:
-                flash("Please enter both username and password")
-                return render_template('login.html')
-                
-            if username == 'admin' and password == 'password123':
-                session['logged_in'] = True
-                return redirect(url_for('dashboard'))
-            
-            flash("Invalid username or password")
-        except Exception as e:
-            flash("An error occurred. Please try again.")
-            logging.error(f"Login error: {str(e)}")
+        if username == 'admin' and password == 'password123':
+            session['logged_in'] = True
+            session.permanent = True
+            return redirect(url_for('dashboard'))
+        
+        flash("Invalid username or password")
     return render_template('login.html')
 
 # Dashboard Route
