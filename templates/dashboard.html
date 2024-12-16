@@ -108,6 +108,7 @@
                         <th>Reference Number</th>
                         <th>Date & Time</th>
                         <th>Location</th>
+                        <th>Photo</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -124,11 +125,27 @@
                         <td>{{ entry[8] }}</td>
                         <td>{{ entry[9] }}</td>
                         <td>{{ entry[10] or 'N/A' }}</td>
+                        <td>
+                            {% if entry[9] %}
+                                <img src="{{ url_for('static', filename=entry[9].replace('static/', '')) }}" 
+                                     class="thumbnail" 
+                                     onclick="showModal(this.src)" 
+                                     alt="Photo">
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img id="modalImage" src="" alt="Zoomed photo">
     </div>
 
     <!-- Footer -->
@@ -140,5 +157,21 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function showModal(src) {
+            document.getElementById('imageModal').style.display = "block";
+            document.getElementById('modalImage').src = src;
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('imageModal')) {
+                closeModal();
+            }
+        }
+    </script>
 </body>
 </html>
