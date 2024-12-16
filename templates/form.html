@@ -31,6 +31,14 @@
             </div>
 
             <div class="form-group">
+                <label for="carOwnership" id="carOwnershipLabel">Car Ownership:</label>
+                <select id="carOwnership" name="carOwnership" onchange="toggleCarFields()" required>
+                    <option value="private">Private</option>
+                    <option value="government">Government</option>
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label for="carType" id="carTypeLabel">Car Type:</label>
                 <input type="text" id="carType" name="carType" required>
             </div>

@@ -7,6 +7,7 @@ function changeLanguage() {
         en: {
             languageSelectLabel: "Select Language:",
             carNumberLabel: "Car Number:",
+            carOwnershipLabel: "Car Ownership:",
             carTypeLabel: "Car Type:",
             carCodeLabel: "Car Code:",
             inspectorIdLabel: "Inspector ID:",
@@ -22,6 +23,7 @@ function changeLanguage() {
         ar: {
             languageSelectLabel: "تغير اللغة:",
             carNumberLabel: "رقم المركبة:",
+            carOwnershipLabel: "ملكية السيارة:",
             carTypeLabel: "نوع السيارة:",
             carCodeLabel: "كود المركبة:",
             inspectorIdLabel: "رقم المفتش:",
@@ -108,4 +110,22 @@ function openCamera() {
     const photoInput = document.getElementById('photo');
     photoInput.setAttribute('capture', 'environment');
     photoInput.click();
+}
+
+function toggleCarFields() {
+    const ownership = document.getElementById('carOwnership').value;
+    const carType = document.getElementById('carType');
+    const carCode = document.getElementById('carCode');
+    
+    if (ownership === 'government') {
+        carType.value = 'Government Vehicle';
+        carCode.value = 'GOV';
+        carType.disabled = true;
+        carCode.disabled = true;
+    } else {
+        carType.value = '';
+        carCode.value = '';
+        carType.disabled = false;
+        carCode.disabled = false;
+    }
 }
