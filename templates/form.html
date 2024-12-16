@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rain Service</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header with Language Switcher and Logo -->
+        <div class="header">
+            <div class="language-switcher">
+                <label for="languageSelect" id="languageSelectLabel">Select Language:</label>
+                <select id="languageSelect" onchange="changeLanguage()">
+                    <option value="en">English</option>
+                    <option value="ar">العربية</option>
+                </select>
+            </div>
+            <img src="{{ url_for('static', filename='images/newlogo.png') }}" alt="Logo" class="logo">
+        </div>
+
+        <!-- Form Title -->
+        <h1 id="formTitle">Rain Service</h1>
+
+        <!-- Form -->
+        <form id="dataEntryForm">
+            <div class="form-group">
+                <label for="carNumber" id="carNumberLabel">Car Number:</label>
+                <input type="text" id="carNumber" name="carNumber" required>
+            </div>
+
+            <div class="form-group">
+                <label for="carType" id="carTypeLabel">Car Type:</label>
+                <input type="text" id="carType" name="carType" required>
+            </div>
+
+            <div class="form-group">
+                <label for="carCode" id="carCodeLabel">Car Code:</label>
+                <input type="text" id="carCode" name="carCode" required>
+            </div>
+
+            <div class="form-group">
+                <label for="inspectorId" id="inspectorIdLabel">Inspector ID:</label>
+                <input type="text" id="inspectorId" name="inspectorId" required>
+            </div>
+
+            <div class="form-group">
+                <label for="pullArea" id="pullAreaLabel">Pull Area:</label>
+                <input type="text" id="pullArea" name="pullArea" required>
+            </div>
+
+            <div class="form-group">
+                <label for="dischargeArea" id="dischargeAreaLabel">Discharge Area:</label>
+                <input type="text" id="dischargeArea" name="dischargeArea" required>
+            </div>
+
+            <div class="form-group">
+                <label for="notes" id="notesLabel">Notes:</label>
+                <textarea id="notes" name="notes" rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="location" id="locationLabel">Location:</label>
+                <input type="text" id="location" name="location" readonly>
+                <button type="button" id="getLocationButton" onclick="getLocation()">Get Location</button>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-group">
+                <button type="submit" id="submitButton">Submit</button>
+            </div>
+        </form>
+
+        <!-- Success Message -->
+        <div id="thankYouMessage" style="display: none;">
+            <p>Your Reference Number: <span id="refNumber" style="font-weight: bold; color: green;"></span></p>
+            <div>
+                <a id="whatsappLink" href="#" target="_blank">
+                    <button class="btn-secondary">Share on WhatsApp</button>
+                </a>
+                <a id="telegramLink" href="#" target="_blank">
+                    <button class="btn-secondary">Share on Telegram</button>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Language Switcher Logic
+        function changeLanguage() {
+            const selectedLang = document.getElementById('languageSelect').value;
+            const body = document.body;
+
+            if (selectedLang === 'ar') {
+                body.classList.remove('ltr');
+                body.classList.add('rtl');
+            } else {
+                body.classList.remove('rtl');
+                body.classList.add('ltr');
+            }
+
+            // Update Translations
+            const translations = {
+                en: {
+                    carNumberLabel: "Car Number:",
+                    carTypeLabel: "Car Type:",
+                    carCodeLabel: "Car Code:",
+                    inspectorIdLabel: "Inspector ID:",
+                    pullAreaLabel: "Pull Area:",
+                    dischargeAreaLabel: "Discharge Area:",
+                    notesLabel: "Notes:",
+                    locationLabel: "Location:",
+                    submitButton: "Submit",
+                    formTitle: "Rain Service"
+                },
+                ar: {
+                    carNumberLabel: "رقم السيارة:",
+                    carTypeLabel: "نوع السيارة:",
+                    carCodeLabel: "رمز السيارة:",
+                    inspectorIdLabel: "معرف المفتش:",
+                    pullAreaLabel: "منطقة السحب:",
+                    dischargeAreaLabel: "منطقة التفريغ:",
+                    notesLabel: "الملاحظات:",
+                    locationLabel: "الموقع:",
+                    submitButton: "إرسال",
+                    formTitle: "خدمة المطر"
+                }
+            };
+
+            const langContent = translations[selectedLang];
+            for (const key in langContent) {
+                document.getElementById(key).innerText = langContent[key];
+            }
+        }
+
+        // Get User Location
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const coords = `Lat: ${position.coords.latitude}, Lng: ${position.coords.longitude}`;
+                    document.getElementById('location').value = coords;
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        // Handle Form Submission
+        document.getElementById("dataEntryForm").onsubmit = async function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            const response = await fetch("/", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+            if (data.reference_number) {
+                document.getElementById("thankYouMessage").style.display = "block";
+                document.getElementById("refNumber").innerText = data.reference_number;
+
+                const message = `Your reference number: ${data.reference_number}`;
+                document.getElementById("whatsappLink").href = `https://wa.me/?text=${encodeURIComponent(message)}`;
+                document.getElementById("telegramLink").href = `https://t.me/share/url?url=${encodeURIComponent(message)}`;
+            }
+        };
+    </script>
+</body>
+</html>
