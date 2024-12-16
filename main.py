@@ -147,7 +147,9 @@ def submit():
                     raise ValueError("Invalid date format")
                     
                 current_time = datetime.datetime.now()
-            time_diff = (current_time - last_time).total_seconds()
+                time_diff = (current_time - last_time).total_seconds()
+            except Exception as e:
+                return jsonify({'error': str(e)}), 400
             
             if time_diff < 60:  # 60 seconds cooldown
                 return jsonify({'error': 'Please wait 60 seconds before submitting another entry for the same car number'}), 429
