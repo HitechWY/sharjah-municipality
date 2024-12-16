@@ -124,8 +124,29 @@ def submit():
         last_entry = cursor.fetchone()
         
         if last_entry:
-            last_time = datetime.datetime.strptime(last_entry[0], "%Y-%m-%d %H:%M:%S")
-            current_time = datetime.datetime.now()
+            try:
+                # Try multiple date formats
+                date_formats = [
+                    "%Y-%m-%d %H:%M:%S",  # Standard format
+                    "%m/%d/%Y %I:%M:%S %p",  # US format
+                    "%d/%m/%Y %H:%M:%S",  # UK format
+                    "%Y/%m/%d %H:%M:%S",  # Asian format
+                    "%d-%m-%Y %H:%M:%S",  # UAE format
+                    "%Y.%m.%d %H:%M:%S"   # Alternative format
+                ]
+                
+                last_time = None
+                for date_format in date_formats:
+                    try:
+                        last_time = datetime.datetime.strptime(last_entry[0], date_format)
+                        break
+                    except ValueError:
+                        continue
+                        
+                if last_time is None:
+                    raise ValueError("Invalid date format")
+                    
+                current_time = datetime.datetime.now()
             time_diff = (current_time - last_time).total_seconds()
             
             if time_diff < 60:  # 60 seconds cooldown
@@ -142,17 +163,30 @@ def submit():
         # Save Photo
         photo_path = None
         if photo and photo.filename != '':
+            # Validate image format
+            allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'tiff'}
+            file_ext = photo.filename.rsplit('.', 1)[1].lower()
+            if file_ext not in allowed_extensions:
+                return jsonify({'error': 'Invalid image format. Allowed formats: PNG, JPG, JPEG, GIF, WEBP, BMP, TIFF'}), 400
+
             photo_folder = 'static/uploads/'
             if not os.path.exists(photo_folder):
                 os.makedirs(photo_folder)
-            photo_path = os.path.join(photo_folder, photo.filename)
-            # Open and compress image
-            with Image.open(photo) as img:
-                # Convert to RGB if necessary
-                if img.mode in ('RGBA', 'P'): 
-                    img = img.convert('RGB')
-                # Compress image
-                img.save(photo_path, 'JPEG', quality=85, optimize=True)
+            
+            # Generate unique filename to avoid conflicts
+            timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+            safe_filename = f"{timestamp}_{photo.filename}"
+            photo_path = os.path.join(photo_folder, safe_filename)
+            
+            try:
+                with Image.open(photo) as img:
+                    # Convert to RGB if necessary
+                    if img.mode in ('RGBA', 'P', 'CMYK'): 
+                        img = img.convert('RGB')
+                    # Compress and save image
+                    img.save(photo_path, 'JPEG', quality=85, optimize=True)
+            except Exception as e:
+                return jsonify({'error': f'Error processing image: {str(e)}'}), 400
 
         # Generate Reference Number and Date
         reference_number = generate_reference()
