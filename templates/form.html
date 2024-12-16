@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Rain Service</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -75,6 +76,7 @@
 
             <!-- Submit Button -->
             <div class="form-group">
+                <div class="h-captcha" data-sitekey="10000000-ffff-ffff-ffff-000000000001"></div>
                 <button type="submit" id="submitButton">Submit</button>
             </div>
         </form>
