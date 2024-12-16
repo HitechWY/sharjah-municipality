@@ -13,8 +13,6 @@ from PIL import Image
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 app.permanent_session_lifetime = datetime.timedelta(days=1)
-app.config['HCAPTCHA_SITE_KEY'] = '10000000-ffff-ffff-ffff-000000000001'
-app.config['HCAPTCHA_SECRET_KEY'] = '0x0000000000000000000000000000000000000000'
 
 DATABASE = 'data/entries.db'
 
@@ -117,11 +115,6 @@ def home():
 @app.route('/submit', methods=['POST'])
 def submit():
     try:
-        # Verify hCaptcha
-        h_captcha_response = request.form.get('h-captcha-response')
-        if not h_captcha_response:
-            return jsonify({'error': 'Please complete the CAPTCHA'}), 400
-            
         # Retrieve Form Data
         car_number = request.form['carNumber']
         
