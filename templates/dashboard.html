@@ -107,7 +107,6 @@
                         <th>Notes</th>
                         <th>Reference Number</th>
                         <th>Date & Time</th>
-                        <th>Location</th>
                         <th>Photo</th>
                     </tr>
                 </thead>
@@ -124,10 +123,9 @@
                         <td>{{ entry[7] }}</td>
                         <td>{{ entry[8] }}</td>
                         <td>{{ entry[9] }}</td>
-                        <td>{{ entry[10] or 'N/A' }}</td>
                         <td>
-                            {% if entry[9] %}
-                                <img src="{{ url_for('static', filename=entry[9].replace('static/', '')) }}" 
+                            {% if entry[10] %}
+                                <img src="{{ url_for('static', filename=entry[10].replace('static/', '')) }}" 
                                      class="thumbnail" 
                                      onclick="showModal(this.src)" 
                                      alt="Photo">
