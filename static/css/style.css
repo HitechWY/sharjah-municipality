@@ -19,6 +19,11 @@ body {
     text-align: left;
 }
 
+.rtl {
+    direction: rtl;
+    text-align: right;
+}
+
 .container {
     width: 100%;
     max-width: 500px;

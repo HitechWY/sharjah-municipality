@@ -13,8 +13,8 @@
             <div class="language-switcher">
                 <label for="languageSelect" id="languageSelectLabel">Select Language:</label>
                 <select id="languageSelect" onchange="changeLanguage()">
-                    <option value="en">English</option>
                     <option value="ar">العربية</option>
+                    <option value="en">English</option>
                 </select>
             </div>
             <img src="{{ url_for('static', filename='images/newlogo.png') }}" alt="Logo" class="logo">
@@ -88,6 +88,10 @@
 
     <!-- JavaScript -->
     <script>
+        // Set default language to Arabic on page load
+        window.onload = function() {
+            changeLanguage();
+        }
         // Language Switcher Logic
         function changeLanguage() {
             const selectedLang = document.getElementById('languageSelect').value;
