@@ -28,6 +28,7 @@ def init_db():
         os.makedirs('data')
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
+    cursor.execute('''DROP TABLE IF EXISTS entries''')
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS entries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,7 +41,8 @@ def init_db():
             notes TEXT,
             reference_number TEXT,
             date_time TEXT,
-            photo TEXT
+            photo TEXT,
+            location TEXT
         )
     ''')
     conn.commit()
@@ -74,6 +76,7 @@ def submit():
         pull_area = request.form['pullArea']
         discharge_area = request.form['dischargeArea']
         notes = request.form.get('notes', '')
+        location = request.form.get('location', '')
         photo = request.files['photo'] if 'photo' in request.files else None
 
         # Save Photo
@@ -93,9 +96,9 @@ def submit():
         conn = sqlite3.connect(DATABASE)
         cursor = conn.cursor()
         cursor.execute('''
-            INSERT INTO entries (car_number, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (car_number, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo_path))
+            INSERT INTO entries (car_number, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo, location)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (car_number, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo_path, location))
         conn.commit()
         conn.close()
 
