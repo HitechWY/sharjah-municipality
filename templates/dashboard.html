@@ -38,11 +38,66 @@
 
         /* Table Styles */
         .thumbnail {
-            width: 200px;
-            height: 200px;
+            width: 100px;
+            height: 100px;
             object-fit: cover;
-            cursor: pointer;
+            cursor: zoom-in;
             border-radius: 4px;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+        
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90%;
+            max-height: 90%;
+        }
+        
+        .modal img {
+            width: 800px;
+            height: 400px;
+            object-fit: contain;
+        }
+        
+        .close {
+            position: absolute;
+            right: 25px;
+            top: 15px;
+            color: #f1f1f1;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+        }
+        
+        .zoom-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1001;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .zoom-btn {
+            margin: 0 5px;
+            padding: 5px 10px;
+            cursor: pointer;
         }
         table {
             width: 100%;
@@ -150,7 +205,14 @@
     <!-- Image Modal -->
     <div id="imageModal" class="modal">
         <span class="close" onclick="closeModal()">&times;</span>
-        <img id="modalImage" src="" alt="Zoomed photo">
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="Zoomed photo">
+            <div class="zoom-controls">
+                <button class="zoom-btn" onclick="zoomIn()">+</button>
+                <button class="zoom-btn" onclick="zoomOut()">-</button>
+                <button class="zoom-btn" onclick="resetZoom()">Reset</button>
+            </div>
+        </div>
     </div>
 
     <!-- Footer -->
@@ -163,13 +225,40 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
+        let currentZoom = 1;
+        const zoomStep = 0.2;
+        
         function showModal(src) {
             document.getElementById('imageModal').style.display = "block";
             document.getElementById('modalImage').src = src;
+            resetZoom();
         }
 
         function closeModal() {
             document.getElementById('imageModal').style.display = "none";
+            resetZoom();
+        }
+
+        function zoomIn() {
+            currentZoom += zoomStep;
+            applyZoom();
+        }
+
+        function zoomOut() {
+            if (currentZoom > zoomStep) {
+                currentZoom -= zoomStep;
+                applyZoom();
+            }
+        }
+
+        function resetZoom() {
+            currentZoom = 1;
+            applyZoom();
+        }
+
+        function applyZoom() {
+            const img = document.getElementById('modalImage');
+            img.style.transform = `scale(${currentZoom})`;
         }
 
         window.onclick = function(event) {
@@ -177,6 +266,16 @@
                 closeModal();
             }
         }
+
+        // Handle keyboard events for zoom
+        document.addEventListener('keydown', function(event) {
+            if (document.getElementById('imageModal').style.display === "block") {
+                if (event.key === "Escape") closeModal();
+                if (event.key === "+") zoomIn();
+                if (event.key === "-") zoomOut();
+                if (event.key === "0") resetZoom();
+            }
+        });
     </script>
 </body>
 </html>
