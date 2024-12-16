@@ -15,15 +15,56 @@ app.permanent_session_lifetime = datetime.timedelta(days=1)
 
 DATABASE = 'data/entries.db'
 
-# Error Logging Setup
+# Enhanced Logging Setup
 if not os.path.exists('logs'):
     os.makedirs('logs')
+    os.makedirs('logs/entries')
+    os.makedirs('logs/user_info')
 
-logging.basicConfig(
-    filename='logs/errors.log',
-    level=logging.ERROR,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+# Error logger
+error_logger = logging.getLogger('error_logger')
+error_logger.setLevel(logging.ERROR)
+error_handler = logging.FileHandler('logs/errors.log')
+error_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+error_logger.addHandler(error_handler)
+
+# Entry logger (creates new file daily)
+def get_entry_logger():
+    logger = logging.getLogger('entry_logger')
+    logger.setLevel(logging.INFO)
+    date_str = datetime.datetime.now().strftime('%Y-%m-%d')
+    handler = logging.FileHandler(f'logs/entries/{date_str}_entries.log')
+    handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
+    if logger.handlers:
+        logger.handlers.clear()
+    logger.addHandler(handler)
+    return logger
+
+# User info logger (creates new file daily)
+def get_user_logger():
+    logger = logging.getLogger('user_logger')
+    logger.setLevel(logging.INFO)
+    date_str = datetime.datetime.now().strftime('%Y-%m-%d')
+    handler = logging.FileHandler(f'logs/user_info/{date_str}_user_info.log')
+    handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
+    if logger.handlers:
+        logger.handlers.clear()
+    logger.addHandler(handler)
+    return logger
+
+def log_user_info(request):
+    user_logger = get_user_logger()
+    info = {
+        'ip_address': request.remote_addr,
+        'user_agent': request.headers.get('User-Agent'),
+        'referrer': request.referrer,
+        'path': request.path,
+        'method': request.method,
+        'platform': request.user_agent.platform,
+        'browser': request.user_agent.browser,
+        'language': request.headers.get('Accept-Language')
+    }
+    user_logger.info(f"User Access - {json.dumps(info, indent=2)}")
 
 # Initialize Database
 def init_db():
@@ -65,6 +106,7 @@ def generate_reference():
 # Home Route
 @app.route('/')
 def home():
+    log_user_info(request)
     reference_number = request.args.get('reference_number')
     return render_template('form.html', reference_number=reference_number)
 
@@ -125,6 +167,14 @@ def submit():
         ''', (car_number, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo_path, location, date_time))
         conn.commit()
         conn.close()
+
+        # Log the entry
+        entry_logger = get_entry_logger()
+        entry_logger.info(
+            f"New Entry - Reference: {reference_number}, Car: {car_number}, "
+            f"Type: {car_type}, Inspector: {inspector_id}, "
+            f"Areas: {pull_area}->{discharge_area}"
+        )
 
         # Return JSON Response for AJAX
         return jsonify({'reference_number': reference_number})
