@@ -97,9 +97,10 @@
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
         // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
+        function changeLanguage() {
             const selectedLang = document.getElementById('languageSelect').value;
             const body = document.body;
+            const langContent = translations[selectedLang];
 
             if (selectedLang === 'ar') {
                 body.classList.remove('ltr');
@@ -108,6 +109,18 @@
                 body.classList.remove('rtl');
                 body.classList.add('ltr');
             }
+
+            for (const key in langContent) {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.innerText = langContent[key];
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectedLang = document.getElementById('languageSelect').value;
+            changeLanguage();
 
             // Update Translations
             const translations = {

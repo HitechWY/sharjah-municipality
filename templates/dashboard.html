@@ -170,6 +170,7 @@
                         <th>Reference Number</th>
                         <th>Date & Time</th>
                         <th>Photo</th>
+                        <th>Location</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -191,6 +192,18 @@
                                      class="thumbnail" 
                                      onclick="showModal(this.src)" 
                                      alt="Photo">
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if entry[11] and 'Lat:' in entry[11] %}
+                                {% set coords = entry[11].replace('Lat: ', '').replace('Lng: ', '').split(',') %}
+                                {% if coords|length == 2 %}
+                                    <a href="https://www.google.com/maps?q={{ coords[0].strip() }},{{ coords[1].strip() }}" target="_blank">View on map</a>
+                                {% else %}
+                                    N/A
+                                {% endif %}
                             {% else %}
                                 N/A
                             {% endif %}
