@@ -160,18 +160,21 @@
                     }
                 });
 
-            const data = await response.json();
-            if (!response.ok) {
-                alert('Error submitting form: ' + data.error);
-                return;
-            }
-            if (data.reference_number) {
-                document.getElementById("thankYouMessage").style.display = "block";
-                document.getElementById("refNumber").innerText = data.reference_number;
+                const data = await response.json();
+                if (!response.ok) {
+                    alert('Error submitting form: ' + data.error);
+                    return;
+                }
+                if (data.reference_number) {
+                    document.getElementById("thankYouMessage").style.display = "block";
+                    document.getElementById("refNumber").innerText = data.reference_number;
 
-                const message = `Your reference number: ${data.reference_number}`;
-                document.getElementById("whatsappLink").href = `https://wa.me/?text=${encodeURIComponent(message)}`;
-                document.getElementById("telegramLink").href = `https://t.me/share/url?url=${encodeURIComponent(message)}`;
+                    const message = `Your reference number: ${data.reference_number}`;
+                    document.getElementById("whatsappLink").href = `https://wa.me/?text=${encodeURIComponent(message)}`;
+                    document.getElementById("telegramLink").href = `https://t.me/share/url?url=${encodeURIComponent(message)}`;
+                }
+            } catch (error) {
+                alert('Error submitting form: ' + error.message);
             }
         };
     </script>
