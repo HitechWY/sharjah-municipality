@@ -117,7 +117,7 @@ function toggleCarFields() {
     const carType = document.getElementById('carType');
     const carCode = document.getElementById('carCode');
     
-    if (ownership === 'government') {
+    if (ownership === 'Government') {
         carType.value = 'Government Vehicle';
         carCode.value = 'GOV';
         carType.disabled = true;
