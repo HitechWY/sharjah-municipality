@@ -73,21 +73,47 @@ document.addEventListener('DOMContentLoaded', function() {
     if (form) {
         form.onsubmit = async function(e) {
             e.preventDefault();
-            const formData = new FormData(this);
-            try {
-                const response = await fetch("/submit", {
-                    method: "POST",
-                    body: formData,
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-
-                const data = await response.json();
-                if (!response.ok) {
-                    alert('Error submitting form: ' + data.error);
+            
+            // Validate required fields
+            const requiredFields = ['carNumber', 'carOwnership', 'carType', 'carCode', 'inspectorId', 'pullArea', 'dischargeArea'];
+            for (const field of requiredFields) {
+                const input = document.getElementById(field);
+                if (!input.value.trim()) {
+                    alert(`Please fill in ${field}`);
                     return;
                 }
+            }
+
+            // Create FormData and append all form fields
+            const formData = new FormData();
+            formData.append('carNumber', document.getElementById('carNumber').value.trim());
+            formData.append('carOwnership', document.getElementById('carOwnership').value);
+            formData.append('carType', document.getElementById('carType').value.trim());
+            formData.append('carCode', document.getElementById('carCode').value.trim());
+            formData.append('inspectorId', document.getElementById('inspectorId').value.trim());
+            formData.append('pullArea', document.getElementById('pullArea').value.trim());
+            formData.append('dischargeArea', document.getElementById('dischargeArea').value.trim());
+            formData.append('notes', document.getElementById('notes').value.trim());
+            formData.append('location', document.getElementById('location').value.trim());
+
+            // Handle photo file
+            const photoInput = document.getElementById('photo');
+            if (photoInput.files.length > 0) {
+                formData.append('photo', photoInput.files[0]);
+            }
+
+            try {
+                const response = await fetch('/submit', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Submission failed');
+                }
+
+                const data = await response.json();
                 if (data.reference_number) {
                     document.getElementById("thankYouMessage").style.display = "block";
                     document.getElementById("refNumber").innerText = data.reference_number;
@@ -95,8 +121,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     const message = `Your reference number: ${data.reference_number}`;
                     document.getElementById("whatsappLink").href = `https://wa.me/?text=${encodeURIComponent(message)}`;
                     document.getElementById("telegramLink").href = `https://t.me/share/url?url=${encodeURIComponent(message)}`;
+                    
+                    // Clear form
+                    form.reset();
+                    document.getElementById('location').value = '';
                 }
             } catch (error) {
+                console.error('Submission error:', error);
                 alert('Error submitting form: ' + error.message);
             }
         };
