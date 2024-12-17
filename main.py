@@ -117,12 +117,8 @@ def init_db():
     cursor = conn.cursor()
     log_db_query("Creating new database connection")
     
-    # Only create table if it doesn't exist
-    cursor.execute('''CREATE TABLE IF NOT EXISTS entries
-    
-    # Create table with all required columns
-    cursor.execute('''
-        CREATE TABLE entries (
+    # Create table if it doesn't exist
+    cursor.execute('''CREATE TABLE IF NOT EXISTS entries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             car_number TEXT,
             car_ownership TEXT,
