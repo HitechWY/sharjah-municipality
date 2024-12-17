@@ -142,6 +142,10 @@ def init_db():
     log_server_event("Initializing database")
     if not os.path.exists('data'):
         os.makedirs('data')
+    
+    # Ensure clean database
+    if os.path.exists(DATABASE):
+        os.remove(DATABASE)
         
     with get_db_connection() as conn:
         cursor = conn.cursor()
