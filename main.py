@@ -14,7 +14,36 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 app.permanent_session_lifetime = datetime.timedelta(days=1)
 
+import sqlite3
+from contextlib import contextmanager
+from threading import Lock
+
 DATABASE = 'data/entries.db'
+DB_POOL_SIZE = 20
+connection_pool = []
+pool_lock = Lock()
+
+def init_connection():
+    conn = sqlite3.connect(DATABASE, check_same_thread=False)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+@contextmanager
+def get_db_connection():
+    conn = None
+    try:
+        with pool_lock:
+            if connection_pool:
+                conn = connection_pool.pop()
+            else:
+                conn = init_connection()
+        yield conn
+    finally:
+        with pool_lock:
+            if conn and len(connection_pool) < DB_POOL_SIZE:
+                connection_pool.append(conn)
+            elif conn:
+                conn.close()
 
 # Enhanced Logging Setup
 log_dirs = ['logs', 'logs/entries', 'logs/user_info', 'logs/server', 'logs/database', 'logs/frontend']
@@ -113,9 +142,17 @@ def init_db():
     log_server_event("Initializing database")
     if not os.path.exists('data'):
         os.makedirs('data')
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
-    log_db_query("Creating new database connection")
+        
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        log_db_query("Creating new database connection")
+        
+        # Create indices for frequently accessed columns
+        cursor.execute('CREATE INDEX IF NOT EXISTS idx_car_number ON entries(car_number)')
+        cursor.execute('CREATE INDEX IF NOT EXISTS idx_date_time ON entries(date_time)')
+        cursor.execute('CREATE INDEX IF NOT EXISTS idx_reference_number ON entries(reference_number)')
+        cursor.execute('CREATE INDEX IF NOT EXISTS idx_inspector_id ON entries(inspector_id)')
+        conn.commit()
     
     # Create table if it doesn't exist
     cursor.execute('''CREATE TABLE IF NOT EXISTS entries (
@@ -142,8 +179,8 @@ def init_db():
 # Generate Reference Number
 def generate_reference():
     today = datetime.datetime.now().strftime("%Y-%m-%d")
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
     # Get count of entries for today only
     cursor.execute("SELECT COUNT(*) FROM entries WHERE date_time >= ? AND date_time < ?", 
                   (f"{today} 00:00:00", f"{today} 23:59:59"))
@@ -319,8 +356,8 @@ def dashboard():
     sort_by = request.args.get('sort', 'date_time')
     sort_order = request.args.get('order', 'desc')
     
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
     
     if search_term and search_field != 'all':
         field_map = {
@@ -364,8 +401,8 @@ def dashboard():
 def export_csv():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
     cursor.execute("SELECT * FROM entries")
     entries = cursor.fetchall()
     conn.close()
@@ -388,8 +425,8 @@ def export_csv():
 def export_excel():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
     cursor.execute("SELECT * FROM entries")
     entries = cursor.fetchall()
     conn.close()
