@@ -117,8 +117,8 @@ def init_db():
     cursor = conn.cursor()
     log_db_query("Creating new database connection")
     
-    # Drop existing table to recreate with all columns
-    cursor.execute('DROP TABLE IF EXISTS entries')
+    # Only create table if it doesn't exist
+    cursor.execute('''CREATE TABLE IF NOT EXISTS entries
     
     # Create table with all required columns
     cursor.execute('''
@@ -245,7 +245,7 @@ def submit():
             if file_ext not in allowed_extensions:
                 return jsonify({'error': 'Invalid image format. Allowed formats: PNG, JPG, JPEG, GIF, WEBP, BMP, TIFF'}), 400
 
-            photo_folder = 'static/uploads/'
+            photo_folder = 'static/images/'
             if not os.path.exists(photo_folder):
                 os.makedirs(photo_folder)
             
