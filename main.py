@@ -81,9 +81,12 @@ def init_db():
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     
-    # Create table if it doesn't exist
+    # Drop existing table to recreate with all columns
+    cursor.execute('DROP TABLE IF EXISTS entries')
+    
+    # Create table with all required columns
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS entries (
+        CREATE TABLE entries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             car_number TEXT,
             car_type TEXT,
@@ -95,15 +98,10 @@ def init_db():
             reference_number TEXT,
             date_time TEXT,
             photo TEXT,
-            location TEXT
+            location TEXT,
+            last_submission TEXT
         )
     ''')
-    
-    # Add last_submission column if it doesn't exist
-    cursor.execute("PRAGMA table_info(entries)")
-    columns = [column[1] for column in cursor.fetchall()]
-    if 'last_submission' not in columns:
-        cursor.execute('ALTER TABLE entries ADD COLUMN last_submission TEXT')
     
     conn.commit()
     conn.close()
