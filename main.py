@@ -131,8 +131,19 @@ def home():
 @app.route('/submit', methods=['POST'])
 def submit():
     try:
-        if not request.form:
-            log_error("No form data received", {'request': str(request), 'headers': dict(request.headers)})
+        # Log the incoming request data
+        request_data = {
+            'form': dict(request.form),
+            'files': {k: v.filename for k, v in request.files.items()},
+            'headers': dict(request.headers),
+            'content_type': request.content_type,
+            'content_length': request.content_length,
+            'method': request.method
+        }
+        log_error("Incoming request data", request_data)
+        
+        if not request.form and not request.files:
+            log_error("No form data received", request_data)
             return jsonify({'error': 'No form data received'}), 400
             
         # Retrieve Form Data
