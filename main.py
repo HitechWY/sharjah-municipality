@@ -125,6 +125,7 @@ def init_db():
         CREATE TABLE entries (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             car_number TEXT,
+            car_ownership TEXT,
             car_type TEXT,
             car_code TEXT,
             inspector_id TEXT,
@@ -183,8 +184,12 @@ def submit():
             
         # Retrieve Form Data
         car_number = request.form.get('carNumber')
+        car_ownership = request.form.get('carOwnership')
+        
         if not car_number:
             return jsonify({'error': 'Car number is required'}), 400
+        if not car_ownership:
+            return jsonify({'error': 'Car ownership is required'}), 400
         
         # Check cooldown period
         conn = sqlite3.connect(DATABASE)
@@ -267,9 +272,9 @@ def submit():
         conn = sqlite3.connect(DATABASE)
         cursor = conn.cursor()
         cursor.execute('''
-            INSERT INTO entries (car_number, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo, location, last_submission)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (car_number, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo_path, location, date_time))
+            INSERT INTO entries (car_number, car_ownership, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo, location, last_submission)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (car_number, car_ownership, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo_path, location, date_time))
         conn.commit()
         conn.close()
 
