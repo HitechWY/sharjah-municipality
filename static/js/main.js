@@ -80,7 +80,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: formData,
                     headers: {
                         'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 });
 

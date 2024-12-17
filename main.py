@@ -21,12 +21,22 @@ for dir_path in ['logs', 'logs/entries', 'logs/user_info']:
     if not os.path.exists(dir_path):
         os.makedirs(dir_path, exist_ok=True)
 
-# Error logger
+# Enhanced Error logger
 error_logger = logging.getLogger('error_logger')
 error_logger.setLevel(logging.ERROR)
-error_handler = logging.FileHandler('logs/errors.log')
-error_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+error_handler = logging.FileHandler('logs/error.log')
+error_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s\nRequest Data: %(request_data)s\nStack Trace: %(exc_info)s\n')
+error_handler.setFormatter(error_formatter)
 error_logger.addHandler(error_handler)
+
+def log_error(error, request_data=None):
+    error_logger.error(
+        error,
+        extra={
+            'request_data': request_data or {},
+            'exc_info': True
+        }
+    )
 
 # Entry logger (creates new file daily)
 def get_entry_logger():
@@ -124,6 +134,7 @@ def home():
 def submit():
     try:
         if not request.form:
+            log_error("No form data received", {'request': str(request), 'headers': dict(request.headers)})
             return jsonify({'error': 'No form data received'}), 400
             
         # Retrieve Form Data
