@@ -93,11 +93,14 @@ def log_server_event(message):
     server_logger.info(message)
 
 def log_error(error, request_data=None):
-    error_logger.error(
-        error,
-        extra={'request_data': request_data or {}},
-        exc_info=True
-    )
+    try:
+        error_logger.error(
+            str(error),
+            extra={'request_data': request_data or {}},
+            exc_info=True
+        )
+    except Exception as e:
+        print(f"Failed to log error: {str(e)}")  # Fallback logging
 
 # Entry logger (creates new file daily)
 def get_entry_logger():
@@ -208,11 +211,14 @@ def submit():
             'content_length': request.content_length,
             'method': request.method
         }
-        log_error("Incoming request data", request_data)
-        
-        if not request.form and not request.files:
-            log_error("No form data received", request_data)
-            return jsonify({'error': 'No form data received'}), 400
+        try:
+            log_error("Incoming request data", request_data)
+            
+            if not request.form and not request.files:
+                log_error("No form data received", request_data)
+                return jsonify({'error': 'No form data received'}), 400
+        except Exception as log_error:
+            print(f"Logging error: {str(log_error)}")  # Fallback logging
             
         # Retrieve Form Data
         car_number = request.form.get('carNumber')
