@@ -371,9 +371,12 @@ def export_csv():
     conn.close()
 
     # Prepare CSV Output
-    output = [['ID', 'Car Number', 'Car Type', 'Car Code', 'Inspector ID', 'Pull Area', 'Discharge Area', 'Notes', 'Reference Number', 'Date & Time', 'Photo']]
+    output = [['ID', 'Car Number', 'Car Ownership', 'Car Type', 'Car Code', 'Inspector ID', 'Pull Area', 
+               'Discharge Area', 'Notes', 'Reference Number', 'Date & Time', 'Location']]
     for entry in entries:
-        output.append(entry)
+        # Exclude photo column (index 11)
+        row_data = list(entry[:11]) + [entry[12]]
+        output.append(row_data)
 
     response = make_response('\n'.join([','.join(map(str, row)) for row in output]))
     response.headers["Content-Disposition"] = "attachment; filename=entries.csv"
@@ -394,11 +397,13 @@ def export_excel():
     # Create Excel workbook
     wb = openpyxl.Workbook()
     ws = wb.active
-    ws.append(['ID', 'Car Number', 'Car Type', 'Car Code', 'Inspector ID', 'Pull Area', 
-               'Discharge Area', 'Notes', 'Reference Number', 'Date & Time', 'Photo', 'Location'])
+    ws.append(['ID', 'Car Number', 'Car Ownership', 'Car Type', 'Car Code', 'Inspector ID', 'Pull Area', 
+               'Discharge Area', 'Notes', 'Reference Number', 'Date & Time', 'Location'])
     
     for entry in entries:
-        ws.append(entry)
+        # Exclude photo column (index 11)
+        row_data = list(entry[:11]) + [entry[12]]  # Combine data before and after photo column
+        ws.append(row_data)
 
     # Create response
     response = make_response()
