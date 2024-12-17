@@ -186,8 +186,9 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>Serial Number</th>
                         <th>Car Number</th>
+                        <th>Car Ownership</th>
                         <th>Car Type</th>
                         <th>Car Code</th>
                         <th>Inspector ID</th>
@@ -203,7 +204,7 @@
                 <tbody>
                     {% for entry in entries %}
                     <tr>
-                        <td>{{ entry[0] }}</td>
+                        <td>{{ loop.index }}</td>
                         <td>{{ entry[1] }}</td>
                         <td>{{ entry[2] }}</td>
                         <td>{{ entry[3] }}</td>
@@ -213,6 +214,7 @@
                         <td>{{ entry[7] }}</td>
                         <td>{{ entry[8] }}</td>
                         <td>{{ entry[9] }}</td>
+                        <td>{{ entry[10] }}</td>
                         <td>
                             {% if entry[10] %}
                                 <img src="{{ url_for('static', filename=entry[10].replace('static/', '')) }}" 
