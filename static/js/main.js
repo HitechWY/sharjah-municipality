@@ -79,7 +79,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     method: "POST",
                     body: formData,
                     headers: {
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
                     }
                 });
 

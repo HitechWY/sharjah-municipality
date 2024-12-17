@@ -123,8 +123,13 @@ def home():
 @app.route('/submit', methods=['POST'])
 def submit():
     try:
+        if not request.form:
+            return jsonify({'error': 'No form data received'}), 400
+            
         # Retrieve Form Data
-        car_number = request.form['carNumber']
+        car_number = request.form.get('carNumber')
+        if not car_number:
+            return jsonify({'error': 'Car number is required'}), 400
         
         # Check cooldown period
         conn = sqlite3.connect(DATABASE)
