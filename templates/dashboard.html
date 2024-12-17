@@ -214,10 +214,10 @@
                         <td>{{ entry[7] }}</td>
                         <td>{{ entry[8] }}</td>
                         <td>{{ entry[9] }}</td>
-                        <td>{{ entry[10] }}</td>
+                        <td>{{ entry[9] }}</td>
                         <td>
-                            {% if entry[10] %}
-                                <img src="{{ url_for('static', filename=entry[10].replace('static/', '')) }}" 
+                            {% if entry[11] %}
+                                <img src="{{ url_for('static', filename='uploads/' + entry[11].split('/')[-1]) }}" 
                                      class="thumbnail" 
                                      onclick="showModal(this.src)" 
                                      alt="Photo">
@@ -226,8 +226,8 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if entry[11] and 'Lat:' in entry[11] %}
-                                {% set coords = entry[11].replace('Lat: ', '').replace('Lng: ', '').split(',') %}
+                            {% if entry[12] and 'Lat:' in entry[12] %}
+                                {% set coords = entry[12].replace('Lat: ', '').replace('Lng: ', '').split(',') %}
                                 {% if coords|length == 2 %}
                                     <a href="https://www.google.com/maps?q={{ coords[0].strip() }},{{ coords[1].strip() }}" target="_blank">View on map</a>
                                 {% else %}
