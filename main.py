@@ -17,17 +17,51 @@ app.permanent_session_lifetime = datetime.timedelta(days=1)
 DATABASE = 'data/entries.db'
 
 # Enhanced Logging Setup
-for dir_path in ['logs', 'logs/entries', 'logs/user_info']:
+log_dirs = ['logs', 'logs/entries', 'logs/user_info', 'logs/server', 'logs/database', 'logs/frontend']
+for dir_path in log_dirs:
     if not os.path.exists(dir_path):
         os.makedirs(dir_path, exist_ok=True)
 
-# Enhanced Error logger
+# Server logger
+server_logger = logging.getLogger('server_logger')
+server_logger.setLevel(logging.INFO)
+server_handler = logging.FileHandler('logs/server/server.log')
+server_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+server_handler.setFormatter(server_formatter)
+server_logger.addHandler(server_handler)
+
+# Database logger
+db_logger = logging.getLogger('db_logger')
+db_logger.setLevel(logging.INFO)
+db_handler = logging.FileHandler('logs/database/database.log')
+db_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s\nQuery: %(query)s\nParameters: %(params)s')
+db_handler.setFormatter(db_formatter)
+db_logger.addHandler(db_handler)
+
+# Frontend logger
+frontend_logger = logging.getLogger('frontend_logger')
+frontend_logger.setLevel(logging.INFO)
+frontend_handler = logging.FileHandler('logs/frontend/frontend.log')
+frontend_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s\nEvent: %(event)s\nData: %(data)s')
+frontend_handler.setFormatter(frontend_formatter)
+frontend_logger.addHandler(frontend_handler)
+
+# Error logger
 error_logger = logging.getLogger('error_logger')
 error_logger.setLevel(logging.ERROR)
 error_handler = logging.FileHandler('logs/error.log')
-error_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s\nRequest Data: %(request_data)s')
+error_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s\nRequest Data: %(request_data)s\nStack Trace: %(exc_info)s')
 error_handler.setFormatter(error_formatter)
 error_logger.addHandler(error_handler)
+
+def log_db_query(query, params=None):
+    db_logger.info('Database query executed', extra={'query': query, 'params': params or {}})
+
+def log_frontend_event(event_type, data=None):
+    frontend_logger.info('Frontend event occurred', extra={'event': event_type, 'data': data or {}})
+
+def log_server_event(message):
+    server_logger.info(message)
 
 def log_error(error, request_data=None):
     error_logger.error(
@@ -76,10 +110,12 @@ def log_user_info(request):
 
 # Initialize Database
 def init_db():
+    log_server_event("Initializing database")
     if not os.path.exists('data'):
         os.makedirs('data')
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
+    log_db_query("Creating new database connection")
     
     # Drop existing table to recreate with all columns
     cursor.execute('DROP TABLE IF EXISTS entries')
@@ -128,6 +164,7 @@ def home():
 # Submit Route
 @app.route('/submit', methods=['POST'])
 def submit():
+    log_server_event(f"Form submission received from {request.remote_addr}")
     try:
         # Log the incoming request data
         request_data = {
