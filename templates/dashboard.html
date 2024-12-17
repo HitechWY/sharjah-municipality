@@ -217,7 +217,7 @@
                         <td>{{ entry[10] }}</td>
                         <td>
                             {% if entry[11] %}
-                                <img src="{{ url_for('static', filename=entry[11]) }}" 
+                                <img src="/{{ entry[11] }}" 
                                      class="thumbnail" 
                                      onclick="showModal(this.src)" 
                                      alt="Photo">
