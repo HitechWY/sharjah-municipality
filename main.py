@@ -181,12 +181,11 @@ def generate_reference():
     today = datetime.datetime.now().strftime("%Y-%m-%d")
     with get_db_connection() as conn:
         cursor = conn.cursor()
-    # Get count of entries for today only
-    cursor.execute("SELECT COUNT(*) FROM entries WHERE date_time >= ? AND date_time < ?", 
-                  (f"{today} 00:00:00", f"{today} 23:59:59"))
-    count = cursor.fetchone()[0] + 1
-    conn.close()
-    return f"{today}-{str(count).zfill(4)}"
+        # Get count of entries for today only
+        cursor.execute("SELECT COUNT(*) FROM entries WHERE date_time >= ? AND date_time < ?", 
+                      (f"{today} 00:00:00", f"{today} 23:59:59"))
+        count = cursor.fetchone()[0] + 1
+        return f"{today}-{str(count).zfill(4)}"
 
 # Home Route
 @app.route('/')
