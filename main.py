@@ -175,25 +175,6 @@ def init_db():
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_reference_number ON entries(reference_number)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_inspector_id ON entries(inspector_id)')
         conn.commit()
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            car_number TEXT,
-            car_ownership TEXT,
-            car_type TEXT,
-            car_code TEXT,
-            inspector_id TEXT,
-            pull_area TEXT,
-            discharge_area TEXT,
-            notes TEXT,
-            reference_number TEXT,
-            date_time TEXT,
-            photo TEXT,
-            location TEXT,
-            last_submission TEXT
-        )
-    ''')
-    
-    conn.commit()
-    conn.close()
 
 # Generate Reference Number
 def generate_reference():
