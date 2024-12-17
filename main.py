@@ -25,17 +25,15 @@ for dir_path in ['logs', 'logs/entries', 'logs/user_info']:
 error_logger = logging.getLogger('error_logger')
 error_logger.setLevel(logging.ERROR)
 error_handler = logging.FileHandler('logs/error.log')
-error_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s\nRequest Data: %(request_data)s\nStack Trace: %(exc_info)s\n')
+error_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s\nRequest Data: %(request_data)s')
 error_handler.setFormatter(error_formatter)
 error_logger.addHandler(error_handler)
 
 def log_error(error, request_data=None):
     error_logger.error(
         error,
-        extra={
-            'request_data': request_data or {},
-            'exc_info': True
-        }
+        extra={'request_data': request_data or {}},
+        exc_info=True
     )
 
 # Entry logger (creates new file daily)
