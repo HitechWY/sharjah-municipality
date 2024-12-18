@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, make_response, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, session, make_response, jsonify, send_file
 import sqlite3
 import os
 import datetime
@@ -437,34 +437,43 @@ def export_csv():
 def export_excel():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
-        
+
     try:
+        # Create workbook first
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Entries"
+        
+        # Add headers
+        headers = ['ID', 'Car Number', 'Car Ownership', 'Car Type', 'Car Code', 
+                  'Inspector ID', 'Pull Area', 'Discharge Area', 'Notes', 
+                  'Reference Number', 'Date & Time', 'Location']
+        ws.append(headers)
+
+        # Fetch data inside connection context
         with get_db_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM entries")
             entries = cursor.fetchall()
             
-            # Create Excel workbook
-            wb = openpyxl.Workbook()
-            ws = wb.active
-            ws.append(['ID', 'Car Number', 'Car Ownership', 'Car Type', 'Car Code', 'Inspector ID', 'Pull Area', 
-                     'Discharge Area', 'Notes', 'Reference Number', 'Date & Time', 'Location'])
-            
+            # Add data rows
             for entry in entries:
                 # Exclude photo column (index 11)
-                row_data = list(entry[:11]) + [entry[12]]  # Combine data before and after photo column
+                row_data = list(entry[:11]) + [entry[12]]
                 ws.append(row_data)
 
-            # Create response
-            response = make_response()
-            output = io.BytesIO()
-            wb.save(output)
-            output.seek(0)
-            
-            response.data = output.read()
-            response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            response.headers['Content-Disposition'] = 'attachment; filename=entries.xlsx'
-            return response
+        # Save to BytesIO
+        excel_file = io.BytesIO()
+        wb.save(excel_file)
+        excel_file.seek(0)
+
+        return send_file(
+            excel_file,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            as_attachment=True,
+            download_name='entries.xlsx'
+        )
+
     except Exception as e:
         log_error(f"Error exporting excel: {str(e)}")
         return jsonify({'error': 'Failed to export Excel file'}), 500
