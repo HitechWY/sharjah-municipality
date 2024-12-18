@@ -437,21 +437,23 @@ def export_csv():
 def export_excel():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
-    with get_db_connection() as conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM entries")
-        entries = cursor.fetchall()
-
-    # Create Excel workbook
-    wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.append(['ID', 'Car Number', 'Car Ownership', 'Car Type', 'Car Code', 'Inspector ID', 'Pull Area', 
-               'Discharge Area', 'Notes', 'Reference Number', 'Date & Time', 'Location'])
-    
-    for entry in entries:
-        # Exclude photo column (index 11)
-        row_data = list(entry[:11]) + [entry[12]]  # Combine data before and after photo column
-        ws.append(row_data)
+        
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM entries")
+            entries = cursor.fetchall()
+            
+            # Create Excel workbook
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.append(['ID', 'Car Number', 'Car Ownership', 'Car Type', 'Car Code', 'Inspector ID', 'Pull Area', 
+                     'Discharge Area', 'Notes', 'Reference Number', 'Date & Time', 'Location'])
+            
+            for entry in entries:
+                # Exclude photo column (index 11)
+                row_data = list(entry[:11]) + [entry[12]]  # Combine data before and after photo column
+                ws.append(row_data)
 
     # Create response
     response = make_response()
