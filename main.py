@@ -416,9 +416,8 @@ def export_csv():
         return redirect(url_for('login'))
     with get_db_connection() as conn:
         cursor = conn.cursor()
-    cursor.execute("SELECT * FROM entries")
-    entries = cursor.fetchall()
-    conn.close()
+        cursor.execute("SELECT * FROM entries")
+        entries = cursor.fetchall()
 
     # Prepare CSV Output
     output = [['ID', 'Car Number', 'Car Ownership', 'Car Type', 'Car Code', 'Inspector ID', 'Pull Area', 
@@ -440,9 +439,8 @@ def export_excel():
         return redirect(url_for('login'))
     with get_db_connection() as conn:
         cursor = conn.cursor()
-    cursor.execute("SELECT * FROM entries")
-    entries = cursor.fetchall()
-    conn.close()
+        cursor.execute("SELECT * FROM entries")
+        entries = cursor.fetchall()
 
     # Create Excel workbook
     wb = openpyxl.Workbook()
