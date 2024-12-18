@@ -401,12 +401,16 @@ def dashboard():
                 }
                 column_index = field_map[sort_by]
                 entries = sorted(entries, key=lambda x: x[column_index], reverse=(sort_order == 'desc'))
-    return render_template('dashboard.html', 
-                         entries=entries,
-                         search_term=search_term,
-                         search_field=search_field,
-                         sort_by=sort_by,
-                         sort_order=sort_order)
+            
+            return render_template('dashboard.html', 
+                             entries=entries,
+                             search_term=search_term,
+                             search_field=search_field,
+                             sort_by=sort_by,
+                             sort_order=sort_order)
+    except Exception as e:
+        log_error(f"Error in dashboard: {str(e)}")
+        return jsonify({'error': 'Failed to load dashboard'}), 500
 
 # Export to CSV Route
 @app.route('/export_csv')
