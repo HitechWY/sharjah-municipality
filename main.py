@@ -439,43 +439,43 @@ def export_excel():
         return redirect(url_for('login'))
 
     try:
-        # Create workbook first
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = "Entries"
         
-        # Add headers
         headers = ['ID', 'Car Number', 'Car Ownership', 'Car Type', 'Car Code', 
                   'Inspector ID', 'Pull Area', 'Discharge Area', 'Notes', 
                   'Reference Number', 'Date & Time', 'Location']
         ws.append(headers)
 
-        # Fetch data inside connection context
         with get_db_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM entries")
+            cursor.execute("""
+                SELECT id, car_number, car_ownership, car_type, car_code,
+                       inspector_id, pull_area, discharge_area, notes,
+                       reference_number, date_time, location
+                FROM entries
+                ORDER BY date_time DESC
+            """)
             entries = cursor.fetchall()
             
-            # Add data rows
             for entry in entries:
-                # Exclude photo column (index 11)
-                row_data = list(entry[:11]) + [entry[12]]
-                ws.append(row_data)
+                ws.append([str(cell) if cell is not None else '' for cell in entry])
 
-        # Save to BytesIO
         excel_file = io.BytesIO()
         wb.save(excel_file)
         excel_file.seek(0)
 
         return send_file(
             excel_file,
-            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            download_name='entries.xlsx',
             as_attachment=True,
-            download_name='entries.xlsx'
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
 
     except Exception as e:
         log_error(f"Error exporting excel: {str(e)}")
+        print(f"Excel export error: {str(e)}")  # Add debug print
         return jsonify({'error': 'Failed to export Excel file'}), 500
 
 # Logout Route
