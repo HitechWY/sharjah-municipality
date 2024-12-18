@@ -9,10 +9,15 @@ import json
 import logging
 from PIL import Image
 
+# Create required directories
+for dir_path in ['data', 'static/uploads', 'static/system/images']:
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path, exist_ok=True)
+
 # Initialize Flask App
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
-app.permanent_session_lifetime = datetime.timedelta(days=1)
+app.secret_key = os.urandom(24)  # Generate random secret key on startup
+app.permanent_session_lifetime = datetime.timedelta(hours=12)  # Reduce session lifetime
 
 import sqlite3
 from contextlib import contextmanager
@@ -230,10 +235,10 @@ def submit():
             return jsonify({'error': 'Car ownership is required'}), 400
         
         # Check cooldown period
-        conn = sqlite3.connect(DATABASE)
-        cursor = conn.cursor()
-        cursor.execute("SELECT last_submission FROM entries WHERE car_number = ? ORDER BY last_submission DESC LIMIT 1", (car_number,))
-        last_entry = cursor.fetchone()
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT last_submission FROM entries WHERE car_number = ? ORDER BY last_submission DESC LIMIT 1", (car_number,))
+            last_entry = cursor.fetchone()
         
         if last_entry:
             try:
@@ -279,11 +284,14 @@ def submit():
         if photo and photo.filename != '':
             # Validate image format
             allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'tiff'}
-            file_ext = photo.filename.rsplit('.', 1)[1].lower()
+            try:
+                file_ext = photo.filename.rsplit('.', 1)[1].lower()
+            except IndexError:
+                return jsonify({'error': 'Invalid file format'}), 400
             if file_ext not in allowed_extensions:
                 return jsonify({'error': 'Invalid image format. Allowed formats: PNG, JPG, JPEG, GIF, WEBP, BMP, TIFF'}), 400
 
-            photo_folder = 'static/images/'
+            photo_folder = 'static/uploads/'
             if not os.path.exists(photo_folder):
                 os.makedirs(photo_folder)
             
