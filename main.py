@@ -455,16 +455,19 @@ def export_excel():
                 row_data = list(entry[:11]) + [entry[12]]  # Combine data before and after photo column
                 ws.append(row_data)
 
-    # Create response
-    response = make_response()
-    output = io.BytesIO()
-    wb.save(output)
-    output.seek(0)
-    
-    response.data = output.read()
-    response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    response.headers['Content-Disposition'] = 'attachment; filename=entries.xlsx'
-    return response
+            # Create response
+            response = make_response()
+            output = io.BytesIO()
+            wb.save(output)
+            output.seek(0)
+            
+            response.data = output.read()
+            response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            response.headers['Content-Disposition'] = 'attachment; filename=entries.xlsx'
+            return response
+    except Exception as e:
+        log_error(f"Error exporting excel: {str(e)}")
+        return jsonify({'error': 'Failed to export Excel file'}), 500
 
 # Logout Route
 @app.route('/logout')
