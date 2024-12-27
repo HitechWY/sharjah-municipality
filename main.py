@@ -270,7 +270,6 @@ def submit():
             
             if time_diff < 60:  # 60 seconds cooldown
                 return jsonify({'error': 'Please wait 60 seconds before submitting another entry for the same car number'}), 429
-        car_type = request.form['carType']
         car_code = request.form['carCode']
         inspector_id = request.form['inspectorId']
         pull_area = request.form['pullArea']
@@ -328,8 +327,7 @@ def submit():
         entry_logger = get_entry_logger()
         entry_logger.info(
             f"New Entry - Reference: {reference_number}, Car: {car_number}, "
-            f"Type: {car_type}, Inspector: {inspector_id}, "
-            f"Areas: {pull_area}->{discharge_area}"
+            f"Inspector: {inspector_id}, Areas: {pull_area}->{discharge_area}"
         )
 
         # Return JSON Response for AJAX
