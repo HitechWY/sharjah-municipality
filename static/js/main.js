@@ -7,7 +7,6 @@ function changeLanguage() {
             languageSelectLabel: "Select Language:",
             carNumberLabel: "Car Number:",
             carOwnershipLabel: "Car Ownership:",
-            carTypeLabel: "Car Type:",
             carCodeLabel: "Car Code:",
             inspectorIdLabel: "Administrative number:",
             pullAreaLabel: "Pull Area:",
@@ -23,7 +22,6 @@ function changeLanguage() {
             languageSelectLabel: "تغير اللغة:",
             carNumberLabel: "رقم المركبة:",
             carOwnershipLabel: "ملكية السيارة:",
-            carTypeLabel: "نوع السيارة:",
             carCodeLabel: "كود المركبة:",
             inspectorIdLabel: "الرقم الإداري:",
             pullAreaLabel: "منطقة السحب:",
@@ -74,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             
             // Validate required fields
-            const requiredFields = ['carNumber', 'carOwnership', 'carType', 'carCode', 'inspectorId', 'pullArea', 'dischargeArea'];
+            const requiredFields = ['carNumber', 'carOwnership', 'carCode', 'inspectorId', 'pullArea', 'dischargeArea'];
             for (const field of requiredFields) {
                 const input = document.getElementById(field);
                 if (!input.value.trim()) {

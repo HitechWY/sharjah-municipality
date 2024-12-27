@@ -318,9 +318,9 @@ def submit():
         conn = sqlite3.connect(DATABASE)
         cursor = conn.cursor()
         cursor.execute('''
-            INSERT INTO entries (car_number, car_ownership, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo, location, last_submission)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (car_number, car_ownership, car_type, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo_path, location, date_time))
+            INSERT INTO entries (car_number, car_ownership, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo, location, last_submission)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (car_number, car_ownership, car_code, inspector_id, pull_area, discharge_area, notes, reference_number, date_time, photo_path, location, date_time))
         conn.commit()
         conn.close()
 
