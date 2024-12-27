@@ -85,7 +85,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const formData = new FormData();
             formData.append('carNumber', document.getElementById('carNumber').value.trim());
             formData.append('carOwnership', document.getElementById('carOwnership').value);
-            formData.append('carType', document.getElementById('carType').value.trim());
             formData.append('carCode', document.getElementById('carCode').value.trim());
             formData.append('inspectorId', document.getElementById('inspectorId').value.trim());
             formData.append('pullArea', document.getElementById('pullArea').value.trim());
@@ -142,18 +141,13 @@ function openCamera() {
 
 function toggleCarFields() {
     const ownership = document.getElementById('carOwnership').value;
-    const carType = document.getElementById('carType');
     const carCode = document.getElementById('carCode');
     
     if (ownership === 'Government') {
-        carType.value = 'Government Vehicle';
         carCode.value = 'GOV';
-        carType.disabled = true;
         carCode.disabled = true;
     } else {
-        carType.value = '';
         carCode.value = '';
-        carType.disabled = false;
         carCode.disabled = false;
     }
 }
