@@ -358,6 +358,33 @@ def login():
     return render_template('login.html')
 
 # Dashboard Route
+@app.route('/delete_entry/<int:entry_id>')
+def delete_entry(entry_id):
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM entries WHERE id = ?", (entry_id,))
+            conn.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        log_error(f"Error deleting entry: {str(e)}")
+        return jsonify({'error': 'Failed to delete entry'}), 500
+
+def read_logs():
+    logs = []
+    log_path = 'logs/entries'
+    try:
+        for filename in os.listdir(log_path):
+            if filename.endswith('_entries.log'):
+                with open(os.path.join(log_path, filename), 'r') as f:
+                    logs.extend(f.readlines())
+    except Exception as e:
+        log_error(f"Error reading logs: {str(e)}")
+    return logs
+
 @app.route('/dashboard')
 def dashboard():
     if not session.get('logged_in'):
@@ -368,6 +395,9 @@ def dashboard():
     search_field = request.args.get('field', 'all')
     sort_by = request.args.get('sort', 'date_time')
     sort_order = request.args.get('order', 'desc')
+    
+    # Read logs
+    logs = read_logs()
     
     try:
         with get_db_connection() as conn:
@@ -404,6 +434,7 @@ def dashboard():
             
             return render_template('dashboard.html', 
                              entries=entries,
+                             logs=logs,
                              search_term=search_term,
                              search_field=search_field,
                              sort_by=sort_by,
