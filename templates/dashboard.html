@@ -195,7 +195,7 @@
                         <th>Discharge Area</th>
                         <th>Notes</th>
                         <th>Reference Number</th>
-                        <th>Date & Time</th>
+                        <th>Date & Time (GMT+4)</th>
                         <th>Photo</th>
                         <th>Location</th>
                         <th>Action</th>
@@ -204,10 +204,9 @@
                 <tbody>
                     {% for entry in entries %}
                     <tr>
-                        <td>{{ loop.index }}</td>
+                        <td>{{ "%05d" | format(entry[0]) }}</td>
                         <td>{{ entry[1] }}</td>
                         <td>{{ entry[2] }}</td>
-                        <td>{{ entry[3] }}</td>
                         <td>{{ entry[4] }}</td>
                         <td>{{ entry[5] }}</td>
                         <td>{{ entry[6] }}</td>

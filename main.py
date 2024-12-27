@@ -364,8 +364,20 @@ def delete_entry(entry_id):
     try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
+            # Get photo path before deletion
+            cursor.execute("SELECT photo FROM entries WHERE id = ?", (entry_id,))
+            result = cursor.fetchone()
+            
+            if result and result[0]:
+                photo_path = result[0]
+                # Delete photo file if it exists
+                if os.path.exists(photo_path):
+                    os.remove(photo_path)
+            
+            # Delete database entry
             cursor.execute("DELETE FROM entries WHERE id = ?", (entry_id,))
             conn.commit()
+            
         return jsonify({'success': True})
     except Exception as e:
         log_error(f"Error deleting entry: {str(e)}")
