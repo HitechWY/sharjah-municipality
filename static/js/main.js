@@ -1,4 +1,3 @@
-
 // Language Switcher Logic
 function changeLanguage() {
     const selectedLang = document.getElementById('languageSelect').value;
@@ -10,7 +9,7 @@ function changeLanguage() {
             carOwnershipLabel: "Car Ownership:",
             carTypeLabel: "Car Type:",
             carCodeLabel: "Car Code:",
-            inspectorIdLabel: "Inspector ID:",
+            inspectorIdLabel: "Administrative number:",
             pullAreaLabel: "Pull Area:",
             dischargeAreaLabel: "Discharge Area:",
             notesLabel: "Notes:",
@@ -26,7 +25,7 @@ function changeLanguage() {
             carOwnershipLabel: "ملكية السيارة:",
             carTypeLabel: "نوع السيارة:",
             carCodeLabel: "كود المركبة:",
-            inspectorIdLabel: "رقم المفتش:",
+            inspectorIdLabel: "الرقم الإداري:",
             pullAreaLabel: "منطقة السحب:",
             dischargeAreaLabel: "منطقة التفريغ:",
             notesLabel: "الملاحظات:",
