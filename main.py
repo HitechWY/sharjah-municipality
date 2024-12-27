@@ -423,7 +423,7 @@ def export_csv():
         entries = cursor.fetchall()
 
     # Prepare CSV Output
-    output = [['ID', 'Car Number', 'Car Ownership', 'Car Type', 'Car Code', 'Inspector ID', 'Pull Area', 
+    output = [['ID', 'Car Number', 'Car Ownership', 'Car Code', 'Administrative Number', 'Pull Area', 
                'Discharge Area', 'Notes', 'Reference Number', 'Date & Time', 'Location']]
     for entry in entries:
         # Exclude photo column (index 11)
@@ -446,8 +446,8 @@ def export_excel():
         ws = wb.active
         ws.title = "Entries"
         
-        headers = ['ID', 'Car Number', 'Car Ownership', 'Car Type', 'Car Code', 
-                  'Inspector ID', 'Pull Area', 'Discharge Area', 'Notes', 
+        headers = ['ID', 'Car Number', 'Car Ownership', 'Car Code', 
+                  'Administrative Number', 'Pull Area', 'Discharge Area', 'Notes', 
                   'Reference Number', 'Date & Time', 'Location']
         ws.append(headers)
 
